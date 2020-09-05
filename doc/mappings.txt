@@ -1,0 +1,26 @@
+
+" normal! -> simulate pressing keys in normal mode.
+
+
+
+===================================== NOTES ===================================
+operator command: waits for you to enter a movement command
+    - 'd', 'y', 'c'
+
+" unique key mapping to function call
+" <unique> causes an error if the mapping already exists (created by user)
+" map <unique> <Leader>t <Plug>TestFunction
+
+" <Leader>t calls TestFunction by default. User can change this mapping in
+" .vimrc with map <leader><key> <Plug>TestFunction
+if !hasmapto('<Plug>TestFunction')
+    map <unique> <Leader>t <Plug>TestFunction
+endif
+
+noremap <unique> <script> <Plug>TestFunction <SID>Test
+noremap <SID>Test :call <SID>Test()<CR>
+" flow: <Leader>t -> <Plug>TestFunction -> <SID>Test -> :call <SID>Test()<CR>
+
+
+==================================== TESTING ==================================
+hello "world"
