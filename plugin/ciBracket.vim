@@ -1,10 +1,13 @@
-" Last Change:  2020 Sep 5
+" Author:       Spencer Lall
+" Last Change:  2020 Sep 7
 " License:      MIT
 
 " avoid loading this script twice
 if exists("g:loaded_ciBracket")
     finish
 endif
+
+" ============================= GLOBAL VARIABLES ==============================
 let g:loaded_ciBracket = 1
 
 let g:pairDictionary = { '(': ')',
@@ -21,53 +24,56 @@ let g:getOpeningPair = { ')': '(',
                         \'}': '{',
                         \'>': '<', }
 
-" <operator>i<target_char> is default. Change this mapping in .vimrc with ...
+let g:override = 0
+
+" ============================= KEY MAPPINGS ==============================
 if !hasmapto('<Plug>ciBracketMain', 'o')
     omap i <Plug>ciBracketMain
 endif
 
-" Force yeet function
+" force ciBracket behaviour
 if !hasmapto('<Plug>ciBracketYeet', 'o')
-    omap I <Plug>ciBracketYeet
+    omap I <Plug>ciBracketForceRun
 endif
 
-noremap <Plug>ciBracketMain :<c-u>call <SID>Main(0)<CR>
-noremap <Plug>ciBracketYeet :<c-u>call <SID>Main(1)<CR>
+noremap <Plug>ciBracketMain :<c-u>call <SID>Main()<CR>
+noremap <Plug>ciBracketForceRun :<c-u>call <SID>SetOverride()<CR>
+
+" ============================= FUNCTIONS ==============================
+
+function! s:SetOverride()
+    let g:override = 1
+    call <SID>Main()
+endfunction
 
 " execute operator on string contained inside matching target_char
-function! s:Main(force)
+function! s:Main()
     let l:target_char = nr2char(getchar())
 
-    " just yeet it
-    if a:force
-        if search(l:target_char, '', line('.')) || search(l:target_char, 'b', line('.'))
-            execute "normal! vi". l:target_char
-        endif
+    if g:override
+        call <SID>Run(l:target_char)
 
-    " do checks
     else
-        " if we are already inside brackets, use default behaviour 
         " need to skip comments here
         if s:IsBetween(l:target_char)
+            " figure how to do default behaviour
             return
-            "execute "normal! ".v:operator."i".l:target_char
         else
-            if search(l:target_char, '', line('.')) || search(l:target_char, 'b', line('.'))
-                execute "normal! vi". l:target_char
-            endif
+            call <SID>Run(l:target_char)
         endif
     endif
+
+    let g:override = 0
 endfunction
 
-function! s:IsBetween(bracket)
-    let l:paired_char = g:pairDictionary[a:bracket]
-    if has_key(g:getOpeningPair, a:bracket)
-        return searchpair(l:paired_char, '', a:bracket, 'cnzW')
-    else
-        return searchpair(a:bracket, '', l:paired_char, 'cnzW')
+function! s:IsBetween(c)
+    let l:paired_char = g:pairDictionary[a:c]
+    return has_key(g:getOpeningPair, a:c) ? searchpair(l:paired_char, '', a:c, 'cnzW') :
+                                          \ searchpair(a:c, '', l:paired_char, 'cnzW')
+endfunction
+
+function! s:Run(c)
+    if search(a:c, '', line('.')) || search(a:c, 'b', line('.'))
+        execute "normal! vi". a:c
     endif
 endfunction
-
-function! s:Yeet(bracket)
-endfunction
-

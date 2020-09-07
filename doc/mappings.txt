@@ -44,30 +44,13 @@ noremap <SID>Test :call <SID>Test()<CR>
 
 
 ==================================== TESTING ==================================
-if ((status = getaddrinfo(NULL, local_port, &local_hints, &shared_data->servinfo)) != 0) {
-    -> we want command to edit immediate 
-
-- if we are already inside brackets: edit these brackets
-- 
-
-
-problems: 
-1. it should work regardless of which bracket we press.
-    hello (world d*de) ya what
-    - ci) and ci( should edit inside the immediate brackets
-
-
-Hello 
- world)
- wo whats ) dude whats( up)
-
 
  function 
  {
      awefjalkjef
-     if (hello)
+     if (h(yo)ello)
      {
-        type_t obj("Spencer (lall)")
+        typej_t obj("Spencer (lall)") hehehehe
         int arr[5sdlf] = { 1, 2, 3, 4, 5 }
      }
  }
