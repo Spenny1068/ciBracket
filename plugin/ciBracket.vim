@@ -1,5 +1,3 @@
-" Vim global plugin for adding support for ci<bracket type> that works in the same way ci" works.
-" Author:   Spencer Lall
 " Last Change:  2020 Sep 5
 " License:      MIT
 
@@ -18,18 +16,58 @@ let g:pairDictionary = { '(': ')',
                         \'<': '>',
                         \'>': '<', }
 
-" onoremap mapping gets executed if its after an operator command
-" <c-u> -> after : is entered, clear the command line by removing the inserted range.
-onoremap i :<c-u>call <SID>NextString()<CR>
+let g:getOpeningPair = { ')': '(',
+                        \']': '[',
+                        \'}': '{',
+                        \'>': '<', }
 
-" execute operator on next string contained in target_char
-function! s:NextString()
+" <operator>i<target_char> is default. Change this mapping in .vimrc with ...
+if !hasmapto('<Plug>ciBracketMain', 'o')
+    omap i <Plug>ciBracketMain
+endif
+
+" Force yeet function
+if !hasmapto('<Plug>ciBracketYeet', 'o')
+    omap I <Plug>ciBracketYeet
+endif
+
+noremap <Plug>ciBracketMain :<c-u>call <SID>Main(0)<CR>
+noremap <Plug>ciBracketYeet :<c-u>call <SID>Main(1)<CR>
+
+" execute operator on string contained inside matching target_char
+function! s:Main(force)
     let l:target_char = nr2char(getchar())
-    "let l:paired_char = g:pairDictionary[l:target_char]
 
-    if search(l:target_char, '', line('.')) || search(l:target_char, 'b', line('.'))
-        execute "normal! vi". l:target_char
+    " just yeet it
+    if a:force
+        if search(l:target_char, '', line('.')) || search(l:target_char, 'b', line('.'))
+            execute "normal! vi". l:target_char
+        endif
+
+    " do checks
     else
-        echo "character not found"
+        " if we are already inside brackets, use default behaviour 
+        " need to skip comments here
+        if s:IsBetween(l:target_char)
+            return
+            "execute "normal! ".v:operator."i".l:target_char
+        else
+            if search(l:target_char, '', line('.')) || search(l:target_char, 'b', line('.'))
+                execute "normal! vi". l:target_char
+            endif
+        endif
     endif
 endfunction
+
+function! s:IsBetween(bracket)
+    let l:paired_char = g:pairDictionary[a:bracket]
+    if has_key(g:getOpeningPair, a:bracket)
+        return searchpair(l:paired_char, '', a:bracket, 'cnzW')
+    else
+        return searchpair(a:bracket, '', l:paired_char, 'cnzW')
+    endif
+endfunction
+
+function! s:Yeet(bracket)
+endfunction
+

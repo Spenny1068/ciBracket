@@ -1,7 +1,28 @@
+================================= BEHAVIOUR ==================================
+if (already nested within target characters)
+    - use default behaviour.
+    if (force)
+        - do function so long as target character exists on current line.
+        - either bracket should do the behaviour
+        if (nested)
+            - edit closest matching brackets
 
-" normal! -> simulate pressing keys in normal mode.
+else (ie. regular behaviour does nothing)
+    - do function so long as target character exists on current line.
+    - either bracket should do the behaviour
+    if (force)
+        - you don't need this. proceed as if we didn't force
+
+    if (nested)
+        - edit closest matching brackets
 
 
+FORCE key-mapping: 
+    - default: cI(
+    - make user changeable
+
+CUSTIMAZABLITY
+    - forward/backward scanning precedence
 
 ===================================== NOTES ===================================
 operator command: waits for you to enter a movement command
@@ -34,3 +55,19 @@ problems:
 1. it should work regardless of which bracket we press.
     hello (world d*de) ya what
     - ci) and ci( should edit inside the immediate brackets
+
+
+Hello 
+ world)
+ wo whats ) dude whats( up)
+
+
+ function 
+ {
+     awefjalkjef
+     if (hello)
+     {
+        type_t obj("Spencer (lall)")
+        int arr[5sdlf] = { 1, 2, 3, 4, 5 }
+     }
+ }
