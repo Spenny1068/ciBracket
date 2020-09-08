@@ -26,19 +26,6 @@ let g:getOpeningPair = { ')': '(',
 
 let g:override = 0
 
-" ============================= KEY MAPPINGS ==============================
-if !hasmapto('<Plug>ciBracketMain', 'o')
-    omap i <Plug>ciBracketMain
-endif
-
-" force ciBracket behaviour
-if !hasmapto('<Plug>ciBracketYeet', 'o')
-    omap I <Plug>ciBracketForceRun
-endif
-
-noremap <Plug>ciBracketMain :<c-u>call <SID>Main()<CR>
-noremap <Plug>ciBracketForceRun :<c-u>call <SID>SetOverride()<CR>
-
 " ============================= FUNCTIONS ==============================
 
 function! s:SetOverride()
@@ -56,7 +43,8 @@ function! s:Main()
     else
         " need to skip comments here
         if s:IsBetween(l:target_char)
-            " figure how to do default behaviour
+            execute "normal! ".v:operator."i".l:target_char
+            :startinsert
             return
         else
             call <SID>Run(l:target_char)
@@ -77,3 +65,17 @@ function! s:Run(c)
         execute "normal! vi". a:c
     endif
 endfunction
+
+" ============================= KEY MAPPINGS ==============================
+if !hasmapto('<Plug>ciBracketMain', 'o')
+    omap i <Plug>ciBracketMain
+endif
+
+" force ciBracket behaviour
+if !hasmapto('<Plug>ciBracketYeet', 'o')
+    omap I <Plug>ciBracketForceRun
+endif
+
+noremap <silent> <Plug>ciBracketMain :<c-u>call <SID>Main()<CR>
+noremap <silent> <Plug>ciBracketForceRun :<c-u>call <SID>SetOverride()<CR>
+

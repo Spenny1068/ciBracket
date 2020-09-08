@@ -1,3 +1,15 @@
+==================================== TESTING ==================================
+
+void function(int arg1, std::string arg2) 
+{
+    std::vector<type_t> Vec = { 1, 2, 3, 4, 5 };
+    if (isEmpty())
+    {
+        type_t ob("hello")
+        int arr[5lci12] = { aweflkjaw elkfjawf}
+    }
+}
+
 ================================= BEHAVIOUR ==================================
 if (already nested within target characters)
     - use default behaviour.
@@ -45,12 +57,12 @@ noremap <SID>Test :call <SID>Test()<CR>
 
 ==================================== TESTING ==================================
 
- function 
- {
-     awefjalkjef
-     if (h(yo)ello)
-     {
-        typej_t obj("Spencer (lall)") hehehehe
-        int arr[5sdlf] = { 1, 2, 3, 4, 5 }
-     }
- }
+void function(int arg1, std::string arg2) 
+{
+    std::vector<type_t> Vec = { 1, 2, 3, 4, 5 };
+    if (isEmpty())
+    {
+        type_t ob("hello")
+        int arr[5lci12] = { aweflkjaw elkfjawf}
+    }
+}
