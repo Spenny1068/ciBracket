@@ -43,8 +43,7 @@ function! s:Main()
     else
         " need to skip comments here
         if s:IsBetween(l:target_char)
-            execute "normal! ".v:operator."i".l:target_char
-            :startinsert
+            call <SID>Default(l:target_char)
             return
         else
             call <SID>Run(l:target_char)
@@ -62,6 +61,12 @@ endfunction
 
 function! s:Run(c)
     if search(a:c, '', line('.')) || search(a:c, 'b', line('.'))
+        execute "normal! vi". a:c
+    endif
+endfunction
+
+function! s:Default(c)
+    if search(a:c, '', line('.'))
         execute "normal! vi". a:c
     endif
 endfunction
