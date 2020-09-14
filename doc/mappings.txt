@@ -3,31 +3,49 @@
 void function(int arg1, std::string arg2) 
 {
     std::vector<type_t> Vec = { 1, 2, 3, 4, 5 };
-    if (isEmpty())
+    if (isEmpty())asf
     {
-        type_t ob("hello")
-        int arr[5lci12] = { aweflkjaw elkfjawf}
+        typ("hello")
+        int arr[awelkjf] = { aweflkjaw {elkfjawf}}
+        hello )
     }
 }
 
+hello world, my.name is (Spencer)   -> true
+hello world, my.name is )Spencer)   -> false
+hello (world), my.name is (Spencer)   -> true, forward first
+
+(hello 
+ world), my.name is Spencer   -> true
+
+hello world, my.name (is 
+        Spencer)
+
+hello world), my.name (is (Spencer)   -> true, Spencer
+hello world, my.name (is (Spencer))   -> true, is
 ================================= BEHAVIOUR ==================================
 if (already nested within target characters)
-    - use default behaviour.
     if (force)
-        - do function so long as target character exists on current line.
+        if (target character exists on line)
+            - run
+            - either bracket should do the behaviour
+            if (nested)
+                - edit closest matching brackets
+        else (search fails)
+            - do default behaviour
+    else
+    - use default behaviour.
+
+else (ie. regular behaviour does nothing)
+    if (force)
+        - ignore. proceed as if we didn't force
+    if (target character exists on line)
+        - run
         - either bracket should do the behaviour
         if (nested)
             - edit closest matching brackets
-
-else (ie. regular behaviour does nothing)
-    - do function so long as target character exists on current line.
-    - either bracket should do the behaviour
-    if (force)
-        - you don't need this. proceed as if we didn't force
-
-    if (nested)
-        - edit closest matching brackets
-
+    else
+        - do nothing
 
 FORCE key-mapping: 
     - default: cI(
