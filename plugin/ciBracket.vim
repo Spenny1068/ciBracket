@@ -147,7 +147,7 @@ if !hasmapto('<Plug>ciBracketYeet', 'o')
     map t <Plug>TestFunction
 endif
 
-noremap <Plug>ciBracketMain :<c-u>call <SID>Main()<CR>
-noremap <Plug>TestFunction :<c-u>call <SID>Test()<CR>
-noremap <Plug>ciBracketForceRun :<c-u>call <SID>SetOverride()<CR>
+noremap <silent> <Plug>ciBracketMain :<c-u>call <SID>Main()<CR>
+noremap <silent> <Plug>TestFunction :<c-u>call <SID>Test()<CR>
+noremap <silent> <Plug>ciBracketForceRun :<c-u>call <SID>SetOverride()<CR>
 
