@@ -1,6 +1,6 @@
 ==================================== TESTING ==================================
 
-void function(int arg1, std::string arg2) 
+vid funtion(int arg1, std::string arg2) 
 {
     std::vector<type_t> Vec = { 1, 2, 3, 4, 5 };
     if (isEmpty())asf
@@ -12,8 +12,7 @@ void function(int arg1, std::string arg2)
 }
 
 hello world, my.name is (Spencer)   -> true
-hello world, my.name is )Spencer)   -> false
-hello (world), my.name is (Spencer)   -> true, forward first
+hello (world), my.name is ()   -> true, forward first
 
 (hello 
  world), my.name is Spencer   -> true

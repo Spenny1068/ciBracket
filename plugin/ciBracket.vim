@@ -35,9 +35,20 @@ function! s:SetOverride()
 endfunction
 
 function! s:IsBetween(c)
-    let l:paired_char = g:pairDict[a:c]
-    return has_key(g:openingPairDict, a:c) ? searchpair(l:paired_char, '', a:c, 'cnzW') :
-                                          \ searchpair(a:c, '', l:paired_char, 'cnzW')
+    let l:opening_pair = has_key(g:openingPairDict, a:c) ? g:openingPairDict[a:c] : a:c
+    let l:currentlnum = line('.')
+    let l:currentcolnum = col(".")
+    let l:save_cursor = getpos(".")
+
+    if search(l:opening_pair, 'Wb')
+        execute "normal! %"
+        if (line('.') > l:currentlnum) || ((line('.') == l:currentlnum) && (col('.') > l:currentcolnum))
+            call setpos('.', l:save_cursor)
+            return 1
+        endif
+    endif
+    call setpos('.', l:save_cursor)
+    return 0
 endfunction
 
 function! s:Run(c)
@@ -68,15 +79,21 @@ function! s:TargetOnLine(c)
         endif
     endwhile
 
-    if l:found_forward
-        while search(l:closing_pair, '', line('.'))
-            if searchpair(l:closing_pair, '', l:opening_pair, 'nzW')
+    if !l:found_forward
+        while search(l:closing_pair, 'b', line('.'))
+            if searchpair(l:closing_pair, 'b', l:opening_pair, 'nzW')
                 let l:found_backward = 1
                 break
             endif
         endwhile
     endif
     return l:found_forward || l:found_backward
+endfunction
+
+function! s:Test()
+    let l:target_char = nr2char(getchar())
+    :call <SID>IsBetween(l:target_char)
+
 endfunction
 
 " ============================= MAIN FUNCTION ================================
@@ -121,11 +138,16 @@ if !hasmapto('<Plug>ciBracketMain', 'o')
 endif
 
 " force ciBracket behaviour
-if !hasmapto('<Plug>ciBracketYeet', 'o')
+if !hasmapto('<Plug>ciBracketForceRun', 'o')
     omap I <Plug>ciBracketForceRun
 endif
 
+" force ciBracket behaviour
+if !hasmapto('<Plug>ciBracketYeet', 'o')
+    map t <Plug>TestFunction
+endif
+
 noremap <Plug>ciBracketMain :<c-u>call <SID>Main()<CR>
-"noremap <Plug>ciBracketMain :<c-u>call <SID>TargetOnLine()<CR>
+noremap <Plug>TestFunction :<c-u>call <SID>Test()<CR>
 noremap <Plug>ciBracketForceRun :<c-u>call <SID>SetOverride()<CR>
 
