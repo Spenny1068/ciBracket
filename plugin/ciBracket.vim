@@ -1,5 +1,5 @@
 " Author:       Spencer Lall
-" Last Change:  2020 Sep 7
+" Last Change:  2020 Sep 15
 " License:      MIT
 
 " avoid loading this script twice
@@ -18,16 +18,37 @@ let g:pairDict = { '(': ')',
                         \'{': '}',
                         \'}': '{',
                         \'<': '>',
-                        \'>': '<', }
+                        \'>': '<', 
+                        \"\"": "\"",
+                        \"'": "'", }
 
 let g:openingPairDict = { ')': '(',
                         \']': '[',
                         \'}': '{',
-                        \'>': '<', }
+                        \'>': '<',
+                        \"\"": "\"",
+                        \"'": "'", }
 
+let g:quoteList = ['"', '''', '`']
 let g:override = 0
+let g:isQuotes = 0
 
 " =========================== HELPER FUNCTIONS ===============================
+
+" https://github.com/airblade/vim-matchquote
+function! s:MatchQuote(c)
+
+    " do nothing if odd # quotes on line; return 0
+    let l:num = len(split(getline('.'), a:c, 1)) - 1
+    if l:num % 2 == 1
+        return 0
+    endif
+
+    let l:col = getpos('.')[2]
+    let l:num = len(split(getline('.')[0:l:col-1], a:c, 1)) - 1
+    execute (l:num % 2 == 0) ? "normal!F".a:c : "normal!f".a:c
+    return 1
+endfunction
 
 function! s:SetOverride()
     let g:override = 1
@@ -41,7 +62,13 @@ function! s:IsBetween(c)
     let l:save_cursor = getpos(".")
 
     if search(l:opening_pair, 'Wb')
-        execute "normal! %"
+
+        if g:isQuotes
+            call <SID>MatchQuote(a:c)
+        else
+            execute "normal! %"
+        endif
+
         if (line('.') > l:currentlnum) || ((line('.') == l:currentlnum) && (col('.') > l:currentcolnum))
             call setpos('.', l:save_cursor)
             return 1
@@ -70,36 +97,45 @@ function! s:TargetOnLine(c)
     let l:found_forward = 0
     let l:found_backward = 0
 
-    " check if opening bracket exists forward in this line and it has a pair
-    " while theres an opening bracket on this line
-    while search(l:opening_pair, '', line('.'))
-        if searchpair(l:opening_pair, '', l:closing_pair, 'nzW')
+    if g:isQuotes
+        if (search(a:c, '', line('.')) || search(a:c, 'b', line('.'))) && (s:MatchQuote(a:c))
             let l:found_forward = 1
-            break
         endif
-    endwhile
-
-    if !l:found_forward
-        while search(l:closing_pair, 'b', line('.'))
-            if searchpair(l:closing_pair, 'b', l:opening_pair, 'nzW')
-                let l:found_backward = 1
+    else
+        " check if opening bracket exists forward in this line and it has a pair
+        " while theres an opening bracket on this line
+        while search(l:opening_pair, '', line('.'))
+            if searchpair(l:opening_pair, '', l:closing_pair, 'nzW')
+                let l:found_forward = 1
                 break
             endif
         endwhile
+
+        if !l:found_forward
+            while search(l:closing_pair, 'b', line('.'))
+                if searchpair(l:closing_pair, 'b', l:opening_pair, 'nzW')
+                    let l:found_backward = 1
+                    break
+                endif
+            endwhile
+        endif
     endif
     return l:found_forward || l:found_backward
 endfunction
 
 function! s:Test()
     let l:target_char = nr2char(getchar())
-    :call <SID>IsBetween(l:target_char)
-
+    :call <SID>MatchQuote(l:target_char)
 endfunction
 
 " ============================= MAIN FUNCTION ================================
 
 function! s:Main()
     let l:target_char = nr2char(getchar())
+
+    if index(g:quoteList, l:target_char) >= 0
+        let g:isQuotes = 1
+    endif
 
     if s:IsBetween(l:target_char)
         if g:override
@@ -117,19 +153,8 @@ function! s:Main()
         endif
     endif
 
-    "if g:override
-    "    call <SID>Run(l:target_char)
-    "else
-    "    " need to skip comments here
-    "    if s:IsBetween(l:target_char)
-    "        call <SID>Default(l:target_char)
-    "        return
-    "    else
-    "        call <SID>Run(l:target_char)
-    "    endif
-    "endif
-
     let g:override = 0
+    let g:isQuotes = 0
 endfunction
 
 " ============================= KEY MAPPINGS ==============================

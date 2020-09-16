@@ -5,14 +5,17 @@ vid funtion(int arg1, std::string arg2)
     std::vector<type_t> Vec = { 1, 2, 3, 4, 5 };
     if (isEmpty())asf
     {
-        typ("hello")
+        print("hllo")
         int arr[awelkjf] = { aweflkjaw {elkfjawf}}
         hello )
     }
 }
 
-hello world, my.name is (Spencer)   -> true
+"hello world", my.name is (Spencer)   -> true
+hello 'world', my.name is (Spencer)   -> true
 hello (world), my.name is ()   -> true, forward first
+hello world, my.name is "
+    dude hah"
 
 (hello 
  world), my.name is Spencer   -> true
