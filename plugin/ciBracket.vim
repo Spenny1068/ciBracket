@@ -1,26 +1,19 @@
 " Author:       Spencer Lall
-" Last Change:  2020 Sep 15
+" Last Change:  2020 Sep 17
 " License:      MIT
 
-" avoid loading this script twice
 if exists("g:loaded_ciBracket")
     finish
 endif
+let g:loaded_ciBracket = 1
 
 " ============================= GLOBAL VARIABLES ==============================
 
-let g:loaded_ciBracket = 1
-
-let g:pairDict = { '(': ')',
-                        \')': '(',
-                        \'[': ']',
-                        \']': '[',
-                        \'{': '}',
-                        \'}': '{',
-                        \'<': '>',
-                        \'>': '<', 
-                        \"\"": "\"",
-                        \"'": "'", }
+let g:pairDict = { '(': ')', ')': '(',
+                  \'[': ']', ']': '[',
+                  \'{': '}', '}': '{',
+                  \'<': '>', '>': '<', 
+                  \"\"": "\"", "'": "'", }
 
 let g:openingPairDict = { ')': '(',
                         \']': '[',
@@ -30,15 +23,25 @@ let g:openingPairDict = { ')': '(',
                         \"'": "'", }
 
 let g:quoteList = ['"', '''', '`']
+
 let g:override = 0
 let g:isQuotes = 0
 
 " =========================== HELPER FUNCTIONS ===============================
 
-" https://github.com/airblade/vim-matchquote
+function! s:FindPair(c)
+    if g:isQuotes
+        call <SID>MatchQuote(a:c)
+    else
+        execute "normal! %"
+    endif
+endfunction
+
+" move to matching quote and return true, if there is one. else don't move and
+" return false
+" credit: https://github.com/airblade/vim-matchquote
 function! s:MatchQuote(c)
 
-    " do nothing if odd # quotes on line; return 0
     let l:num = len(split(getline('.'), a:c, 1)) - 1
     if l:num % 2 == 1
         return 0
@@ -48,6 +51,7 @@ function! s:MatchQuote(c)
     let l:num = len(split(getline('.')[0:l:col-1], a:c, 1)) - 1
     execute (l:num % 2 == 0) ? "normal!F".a:c : "normal!f".a:c
     return 1
+
 endfunction
 
 function! s:SetOverride()
@@ -55,30 +59,28 @@ function! s:SetOverride()
     call <SID>Main()
 endfunction
 
+" check if cursor is between target_char. If it is return true. else return false
 function! s:IsBetween(c)
     let l:opening_pair = has_key(g:openingPairDict, a:c) ? g:openingPairDict[a:c] : a:c
-    let l:currentlnum = line('.')
-    let l:currentcolnum = col(".")
-    let l:save_cursor = getpos(".")
+    let l:cursor_b = getcurpos()
+    let l:cursor_a = 0
+    let l:is_between = 0
 
     if search(l:opening_pair, 'Wb')
+        call <SID>FindPair(a:c)
+        let l:cursor_a = getcurpos()
 
-        if g:isQuotes
-            call <SID>MatchQuote(a:c)
-        else
-            execute "normal! %"
-        endif
-
-        if (line('.') > l:currentlnum) || ((line('.') == l:currentlnum) && (col('.') > l:currentcolnum))
-            call setpos('.', l:save_cursor)
-            return 1
+        if (l:cursor_a[1] > l:cursor_b[1]) || ((l:cursor_a[1] == l:cursor_b[1]) && (cursor_a[2] > l:cursor_b[2]))
+            let l:is_between = 1
         endif
     endif
-    call setpos('.', l:save_cursor)
-    return 0
+
+    call setpos('.', l:cursor_b)
+    return l:is_between
 endfunction
 
 function! s:Run(c)
+    call <SID>FindTargetOnLine(a:c)
     execute "normal! vi". a:c
 endfunction
 
@@ -86,12 +88,10 @@ function! s:Default(c)
     execute "normal! vi". a:c
 endfunction
 
-" this function will return true if
-" 1. forward: there is opening bracket on this line and it has a pair
-" 2. backward: there is closing backet on this line and it has a pair
-function! s:TargetOnLine(c)
+" find and move to target_char if it exists on current line and has a pair.
+" else, do nothing
+function! s:FindTargetOnLine(c)
 
-    " get opening and closing bracket
     let l:opening_pair = has_key(g:openingPairDict, a:c) ? g:openingPairDict[a:c] : a:c
     let l:closing_pair = g:pairDict[l:opening_pair]
     let l:found_forward = 0
@@ -102,8 +102,6 @@ function! s:TargetOnLine(c)
             let l:found_forward = 1
         endif
     else
-        " check if opening bracket exists forward in this line and it has a pair
-        " while theres an opening bracket on this line
         while search(l:opening_pair, '', line('.'))
             if searchpair(l:opening_pair, '', l:closing_pair, 'nzW')
                 let l:found_forward = 1
@@ -133,24 +131,25 @@ endfunction
 function! s:Main()
     let l:target_char = nr2char(getchar())
 
+    " target_char is invalid
+    if !has_key(g:pairDict, l:target_char)
+        call <SID>Default(l:target_char)
+        return
+    endif
+
+    " target_char is a quote
     if index(g:quoteList, l:target_char) >= 0
         let g:isQuotes = 1
     endif
 
     if s:IsBetween(l:target_char)
         if g:override
-            if s:TargetOnLine(l:target_char)
-                call <SID>Run(l:target_char)
-            else
-                call <SID>Default(l:target_char)
-            endif
+            call <SID>Run(l:target_char)
         else
             call <SID>Default(l:target_char)
         endif
     else
-        if s:TargetOnLine(l:target_char)
-            call <SID>Run(l:target_char)
-        endif
+        call <SID>Run(l:target_char)
     endif
 
     let g:override = 0
@@ -158,6 +157,7 @@ function! s:Main()
 endfunction
 
 " ============================= KEY MAPPINGS ==============================
+
 if !hasmapto('<Plug>ciBracketMain', 'o')
     omap i <Plug>ciBracketMain
 endif
@@ -175,4 +175,3 @@ endif
 noremap <silent> <Plug>ciBracketMain :<c-u>call <SID>Main()<CR>
 noremap <silent> <Plug>TestFunction :<c-u>call <SID>Test()<CR>
 noremap <silent> <Plug>ciBracketForceRun :<c-u>call <SID>SetOverride()<CR>
-
