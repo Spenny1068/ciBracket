@@ -1,8 +1,8 @@
+" ciBracket.vim - extends ci", ci' functionality to brackets 
 " Author:       Spencer Lall
-" Last Change:  2020 Sep 17
 " License:      MIT
 
-if exists("g:loaded_ciBracket")
+if exists("g:loaded_ciBracket") || v:version < 800
     finish
 endif
 let g:loaded_ciBracket = 1
@@ -62,8 +62,8 @@ endfunction
 " check if cursor is between target_char. If it is return true. else return false
 function! s:IsBetween(c)
     let l:opening_pair = has_key(g:openingPairDict, a:c) ? g:openingPairDict[a:c] : a:c
-    let l:cursor_b = getcurpos()
-    let l:cursor_a = 0
+    let l:cursor_b = getcurpos()    " cursor before movement
+    let l:cursor_a = 0              " cursor after movement
     let l:is_between = 0
 
     if search(l:opening_pair, 'Wb')
@@ -121,11 +121,6 @@ function! s:FindTargetOnLine(c)
     return l:found_forward || l:found_backward
 endfunction
 
-function! s:Test()
-    let l:target_char = nr2char(getchar())
-    :call <SID>MatchQuote(l:target_char)
-endfunction
-
 " ============================= MAIN FUNCTION ================================
 
 function! s:Main()
@@ -167,11 +162,5 @@ if !hasmapto('<Plug>ciBracketForceRun', 'o')
     omap I <Plug>ciBracketForceRun
 endif
 
-" force ciBracket behaviour
-if !hasmapto('<Plug>ciBracketYeet', 'o')
-    map t <Plug>TestFunction
-endif
-
 noremap <silent> <Plug>ciBracketMain :<c-u>call <SID>Main()<CR>
-noremap <silent> <Plug>TestFunction :<c-u>call <SID>Test()<CR>
 noremap <silent> <Plug>ciBracketForceRun :<c-u>call <SID>SetOverride()<CR>

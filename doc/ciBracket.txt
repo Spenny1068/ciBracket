@@ -1,0 +1,29 @@
+ciBracket:  Plugin for changing, deleting, yanking, etc. text between brackets and quotes.
+
+Author:  Spencer Lall
+License: see LICENSE
+
+This plugin only has two mappings:
+* i: extends the normal i "inner" functionality in vim when used after operator character (c, d, y, etc.)
+    * examples: ci), ci", ci}, ci', etc.
+* I: exact same functionality as i "inner" except it will search forwards and backwards on the line for the desired character
+    * examples: cI), cI", cI}, cI', etc.
+
+The best way to explain is with a bunch of examples:
+* the cursor location is represented by ..
+* you can replace () with any of (), {}, <>, "", '' and it should work
+
+Use case: cursor not already inside a pair of brackets
+
+        Text                                      Commands                 Result message
+Th..is is (an example) text message          ci), di), yi), etc.       this is (..) text message
+This is (an example) te..xt message          ci), di), yi), etc.       this is (..) text message
+
+Use case: cursor inside a pair of brackets
+* If theres another pair of brackets somewhere on the line, capital I will jump to it
+
+        Text                                      Commands                 Result message
+This is (an ex..mple text) message           ci), di), yi), etc.       this is (..) message
+This is (an.. (example text)) message        ci), di), yi), etc.       this is (..) message
+This is (an.. (example text)) message        cI), dI), yI), etc.       this is (an (..)) message
+This is (an (ex..mple text)) message         ci), di), yi), etc.       this is (an (..)) message
