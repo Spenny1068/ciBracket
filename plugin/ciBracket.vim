@@ -80,8 +80,14 @@ function! s:IsBetween(c)
 endfunction
 
 function! s:Run(c)
-    call <SID>FindTargetOnLine(a:c)
-    execute "normal! vi". a:c
+    if s:FindTargetOnLine(a:c)
+        execute "normal! vi". a:c
+        if matchstr(getline('.'), '\%' . col('.') . 'c.') == a:c
+            echo "nothing in brackets"
+        endif 
+    else 
+        execute "normal! \<esc>"
+    endif
 endfunction
 
 function! s:Default(c)
@@ -91,6 +97,8 @@ endfunction
 " find and move to target_char if it exists on current line and has a pair.
 " else, do nothing
 function! s:FindTargetOnLine(c)
+
+    let l:cursor_b = getcurpos()    " cursor before movement
 
     let l:opening_pair = has_key(g:openingPairDict, a:c) ? g:openingPairDict[a:c] : a:c
     let l:closing_pair = g:pairDict[l:opening_pair]
@@ -118,7 +126,13 @@ function! s:FindTargetOnLine(c)
             endwhile
         endif
     endif
-    return l:found_forward || l:found_backward
+
+    if (l:found_forward == 0) && (l:found_backward == 0)
+        call setpos('.', l:cursor_b)
+        return 0
+    else
+        return 1
+    endif
 endfunction
 
 " ============================= MAIN FUNCTION ================================
@@ -129,6 +143,7 @@ function! s:Main()
     " target_char is invalid
     if !has_key(g:pairDict, l:target_char)
         call <SID>Default(l:target_char)
+        execute "normal! \<esc>"
         return
     endif
 
