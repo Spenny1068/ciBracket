@@ -27,3 +27,4 @@ This is (an ex..mple text) message           ci), di), yi), etc.       this is (
 This is (an.. (example text)) message        ci), di), yi), etc.       this is (..) message
 This is (an.. (example text)) message        cI), dI), yI), etc.       this is (an (..)) message
 This is (an (ex..mple text)) message         ci), di), yi), etc.       this is (an (..)) message
+This is an ( example ( text ) message ) ..   ci), di), yi), etc.       this is an () ..

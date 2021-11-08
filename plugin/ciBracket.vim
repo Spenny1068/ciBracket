@@ -23,7 +23,6 @@ let g:openingPairDict = { ')': '(',
                         \"'": "'", }
 
 let g:quoteList = ['"', '''', '`']
-
 let g:override = 0
 let g:isQuotes = 0
 
@@ -110,8 +109,8 @@ function! s:FindTargetOnLine(c)
         endwhile
 
         if !l:found_forward
-            while search(l:closing_pair, 'b', line('.'))
-                if searchpair(l:closing_pair, 'b', l:opening_pair, 'nzW')
+            while search(l:opening_pair, 'b', line('.'))
+                if searchpair(l:opening_pair, l:opening_pair, 'nW')
                     let l:found_backward = 1
                     break
                 endif
@@ -137,6 +136,7 @@ function! s:Main()
         let g:isQuotes = 1
     endif
 
+    " target_char is a bracket
     if s:IsBetween(l:target_char)
         if g:override
             call <SID>Run(l:target_char)
